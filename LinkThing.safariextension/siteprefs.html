@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>LinkThing Settings</title>
+	<script type="text/javascript" src="siteprefs.js"></script>
+	<link rel="stylesheet" type="text/css" href="siteprefs.css">
+</head>
+<body onload="initialize()">
+	<div id="titleBar">LinkThing Settings</div>
+	<div id="prefPaneBg">
+		<div id="globalTab" class="prefTab first" onclick="focusTab(0)">General Settings</div>
+		<div id="localTab" class="prefTab active" onclick="focusTab(1)">Settings for Current Site</div>
+		<div id="advancedTab" class="prefTab" onclick="focusTab(2)">Advanced</div>
+		<div id="filterTab" class="prefTab" onclick="focusTab(3)">URL Filter</div>
+		<div id="globalPane" class="prefPane">
+			<div class="paneTitle" id="gpTitle">General settings<strong>&nbsp;</strong></div>
+			<form id="globalForm">
+				<table border="0">
+					<tr>
+						<td class="label">
+							<label for="kickOffLinks">Offsite links open in:</label>
+						</td>
+						<td class="control">
+							<select id="kickOffLinks" onchange="submitGlobalPref()">
+								<option value="0">(Let the site decide)</option>
+								<option value="1">New tabs</option>
+								<option value="-1">The current tab</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="kickOnLinks">Onsite links open in:</label>
+						</td>
+						<td class="control">
+							<select id="kickOnLinks" onchange="submitGlobalPref()">
+								<option value="0">(Let the site decide)</option>
+								<option value="1">New tabs</option>
+								<option value="-1">The current tab</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="focusLinkTarget" type="checkbox" onchange="submitGlobalPref()">
+							<label for="focusLinkTarget">
+								When opening a link in a new tab, activate the tab
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="focusOriginalTab" type="checkbox"
+								onchange="submitGlobalPref()">
+							<label for="focusOriginalTab">
+								When closing a tab opened by a link, activate the original tab
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="preferWindows" type="checkbox" onchange="submitGlobalPref()">
+							<label for="preferWindows">Use new windows instead of new tabs</label>
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td class="label">
+							<label for="newTabPosition">Position of new active tabs from links:</label>
+						</td>
+						<td class="control">
+							<select id="newTabPosition" onchange="submitGlobalPref()">
+								<!-- <option value="?">(Let Safari decide)</option> -->
+								<option value="-2">Beginning of tab bar</option>
+								<option value="0">Left of current tab</option>
+								<option value="1">Right of current tab</option>
+								<option value="-1">End of tab bar</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="newBgTabPosition">Position of new background tabs from
+								links:</label>
+						</td>
+						<td class="control">
+							<select id="newBgTabPosition" onchange="submitGlobalPref()">
+								<!-- <option value="?">(Let Safari decide)</option> -->
+								<option value="-2">Beginning of tab bar</option>
+								<option value="0">Left of current tab</option>
+								<option value="1">Right of current tab</option>
+								<option value="-1">End of tab bar</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="cmdClickIgnoresTarget" type="checkbox"
+								onchange="submitGlobalPref()">
+							<label for="cmdClickIgnoresTarget">
+								⌘-click <strong>always</strong> opens new tab/window
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="rightClickForCmdClick" type="checkbox"
+								onchange="submitGlobalPref()">
+							<label for="rightClickForCmdClick">
+								Right-click equals ⌘-click &nbsp;<span class="small">(on links only)</span>
+							</label>
+						</td>
+					</tr>
+						<tr>
+							<td class="unified" colspan="2">
+								<input id="rewriteGoogleLinks" type="checkbox"
+									onchange="submitGlobalPref()">
+								<label for="rewriteGoogleLinks">
+									Rewrite Google "url" links as direct links
+								</label>
+							</td>
+						</tr>
+					<tr>
+						<td class="unified" colspan="2">
+							<input id="showLinkHrefs" type="checkbox"
+								onchange="submitGlobalPref()">
+							<label for="showLinkHrefs">
+								Reveal link URLs &nbsp;<span class="small">(only if status bar is hidden)</span>
+							</label>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="localPane" class="prefPane active">
+			<div class="paneTitle" id="lpTitle">Settings for <span id="siteLabel"></span></div>
+			<form id="localForm">
+				<table border="0">
+					<tr>
+						<td class="label">
+							<label for="site.kickOffLinks">Offsite links open in:</label>
+						</td>
+						<td class="control">
+							<select id="site.kickOffLinks" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<option value="0">(Let the site decide)</option>
+								<option value="1">New tabs</option>
+								<option value="-1">This tab</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="site.kickOnLinks">Onsite links open in:</label>
+						</td>
+						<td class="control">
+							<select id="site.kickOnLinks" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<option value="0">(Let the site decide)</option>
+								<option value="1">New tabs</option>
+								<option value="-1">This tab</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td class="label">
+							<label for="site.focusLinkTarget">When opening a link in a new tab:</label>
+						</td>
+						<td class="control">
+							<select id="site.focusLinkTarget" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<option value="1">Make the new tab active</option>
+								<option value="0">Don't make it active</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="site.preferWindows">Use new windows instead of new tabs:</label>
+						</td>
+						<td class="control">
+							<select id="site.preferWindows" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<option value="1">True</option>
+								<option value="0">False</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td class="label">
+							<label for="site.newTabPosition">Position of new active tabs from links:
+								</label>
+						</td>
+						<td class="control">
+							<select id="site.newTabPosition" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<!-- <option value="?">(Let Safari decide)</option> -->
+								<option value="-2">Beginning of tab bar</option>
+								<option value="0">Left of current tab</option>
+								<option value="1">Right of current tab</option>
+								<option value="-1">End of tab bar</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="site.newBgTabPosition">Position of new inactive tabs from
+								links:</label>
+						</td>
+						<td class="control">
+							<select id="site.newBgTabPosition" onchange="submitSitePref()">
+								<option value="">(Use the general setting)</option>
+								<!-- <option value="?">(Let Safari decide)</option> -->
+								<option value="-2">Beginning of tab bar</option>
+								<option value="0">Left of current tab</option>
+								<option value="1">Right of current tab</option>
+								<option value="-1">End of tab bar</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="advancedPane" class="prefPane">
+			<div class="paneTitle" id="fpTitle">Advanced</div>
+			<form id="advancedForm">
+				<table border="0">
+					<tr>
+						<td colspan="2">
+							<input id="useTPOverrideKeys" type="checkbox" onchange="submitGlobalPref()">
+							<label for="useTPOverrideKeys">Use keys to choose target tab on the fly</label>
+						</td>
+					</tr>
+					<tr></tr>
+					<tr>
+						<td colspan="2" class="explain">
+							If this setting is enabled, typing one of the below keys <b>while the mouse is 
+							over a link</b> will override your tab positioning settings for that link only.
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td colspan="2">
+							<label class="hotkey" for="tpoKeyLeftmost">Open in new leftmost tab:</label>
+							<input id="tpoKeyLeftmost" type="text" class="hotkey">
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<label class="hotkey" for="tpoKeyLeft">Open in new left tab:</label>
+							<input id="tpoKeyLeft" type="text" class="hotkey">
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<label class="hotkey" for="tpoKeyRight">Open in new right tab:</label>
+							<input id="tpoKeyRight" type="text" class="hotkey">
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<label class="hotkey" for="tpoKeyRightmost">Open in new rightmost tab:</label>
+							<input id="tpoKeyRightmost" class="hotkey" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<label class="hotkey" for="tpoKeyCurrent">Open in the current tab:</label>
+							<input id="tpoKeyCurrent" class="hotkey" type="text">
+						</td>
+					</tr>
+					<tr class="spaceRow"></tr>
+					<tr>
+						<td colspan="2">
+							<input id="tpOverrideKeyClicks" type="checkbox" onchange="submitGlobalPref()">
+							<label for="tpOverrideKeyClicks">Open link on position override keypress</label>
+						</td>
+					</tr>
+					<tr></tr>
+					<tr>
+						<td colspan="2" class="explain">
+							If this setting is enabled, the link under the mouse will be opened immediately 
+							when you type one of the above keys, eliminating the need to click.
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="filterPane" class="prefPane">
+			<div class="paneTitle" id="fpTitle">URL filter</div>
+			<p class="explain">Enter URL parts or regular expressions to define where LinkThing should be disabled.
+				<br>Place each expression on its own line.</p>
+			<form id="filterForm">
+				<textarea id="filterArea" onchange="submitUrlFilters()"></textarea>
+			</form>
+		</div>
+		<div id="footer" onclick="closeMe()">Press <strong>esc</strong> or click here to close.
+		</div>
+	</div>
+</body>
+</html>

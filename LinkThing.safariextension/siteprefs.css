@@ -1,0 +1,147 @@
+body {
+	background-color: #bbb;
+	height: auto;
+	margin: 0;
+	font-family: Helvetica, sans-serif !important;
+	font-size: 12px;
+}
+#wrapper {
+	height: 100%;
+}
+#titleBar {
+	position: relative;
+	z-index: 1;
+	padding: 3px;
+	background: -webkit-gradient(
+		linear, 0% 0%, 0% 100%,
+		from(#F0F0F0), to(#C8C8C8)
+	);
+	border-top: 1px solid #fafafa;
+	border-bottom: 1px solid #666;
+	-webkit-box-shadow: #888 0px 0px 6px;
+	text-shadow: #E8E8E8 1px 1px 0px;
+	text-align: center;
+	font-family:'Lucida Grande';
+}
+#prefPaneBg {
+	visibility: hidden;
+	height: 100%;
+	background-color: #bbb;
+}
+.prefTab {
+	position: relative;
+	z-index: 0;
+	height: 16px;
+	display: inline-block;
+	background-color: #eee;
+	border: 1px solid #888;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	margin: 3px 0px 0px;
+	padding: 2px 12px 1px;
+	text-align: center;
+	font-family:'Lucida Grande';
+	font-size: 11px;
+	cursor: pointer;
+}
+.prefTab.first {
+	margin-left: 10px;
+}
+.prefTab.active {
+	z-index: 2;
+	height: 17px;
+	background-color: #fff;
+	border-bottom-style: none;
+	/*font-weight: bold;*/
+}
+.prefPane {
+	display: none;
+	position: relative;
+	z-index: 1;
+	height: 338px;
+	overflow: scroll;
+	background: -webkit-gradient(
+	  linear,
+	  left top,
+	  left bottom,
+	  color-stop(0,rgb(255,255,255)),
+	  color-stop(1,rgb(244,244,244)) );
+	-webkit-box-shadow: #888 0px 0px 8px;
+	padding: 16px;
+}
+.prefPane.active {
+	display: block;
+}
+.paneTitle {
+	margin: 0px 12px 12px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid #444;
+	outline-bottom: 1px solid white;
+	font-size: 16px;
+}
+.gpTitle {
+}
+.lpTitle {
+}
+#siteLabel {
+	font-weight: bold;
+}
+form > table {
+	margin: 0px 16px;
+}
+tr.spaceRow {
+	height: 12px;
+}
+td {
+	vertical-align: middle;
+}
+td.label {
+	text-align: right;
+}
+td.control {
+	text-align: left;
+}
+td.unified {
+	text-align: left;
+	padding-left: 64px;
+}
+label {
+	font-size: 12px;
+}
+label.hotkey {
+	display: inline-block;
+	width: 24ex;
+	margin-left: 20px;
+	margin-right: 5px;
+	text-align: left;
+}
+input.hotkey {
+	width: 3ex;
+	height: 12px;
+	text-align: center;
+}
+span.small {
+	font-size: 11px;
+}
+.explain {
+	margin: 0 12px 12px;
+	font-size: 11px;
+}
+#filterArea {
+	width: 414px;
+	height: 235px;
+	margin: 0 12px;
+	padding: 2px 4px;
+	resize: none;
+	font: normal 11px/1.4 Menlo;
+}
+#footer {
+	position: absolute;
+	bottom: 2px;
+	width: 100%;
+	height: 20px;
+	text-align: center;
+	font-family: 'Lucida Grande';
+	font-size: 11px;
+	cursor: pointer;
+}
