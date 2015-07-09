@@ -83,7 +83,7 @@ HTMLAnchorElement.prototype.processLinkClick = function (e) {
 			}
 		}
 		var willKick = link.willKick(e, true);
-		console.log('Link will kick:', willKick);
+		// console.log('Link will kick:', willKick);
 		if (willKick) {
 			var background = !(e.shiftKey ^ settings.focusLinkTarget);
 			var positionSetting = 
