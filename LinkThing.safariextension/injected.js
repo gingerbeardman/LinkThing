@@ -13,8 +13,9 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 			if (ps == 1)
 				positionOverride.ps = null;
 			var evt = new MouseEvent('click', {
-				button  : 0,
-				metaKey : ps !== null
+				button   : 0,
+				metaKey  : ps !== null,
+				shiftKey : positionOverride.fr
 			});
 			this.dispatchEvent(evt);
 		}
