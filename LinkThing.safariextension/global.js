@@ -1,3 +1,70 @@
+const defaults = {
+	kickOnLinks           : 0,
+	kickOffLinks          : 0,
+	newTabPosition        : null,
+	newBgTabPosition      : null,
+	focusLinkTarget       : true,
+	preferWindows         : false,
+	cmdClickIgnoresTarget : true,
+	rightClickForCmdClick : false,
+	useTPOverrideKeys     : false,
+	tpOverrideKeyClicks   : false,
+	rewriteGoogleLinks    : false,
+	showLinkHrefs         : true,
+	showMenuItems         : true,
+	focusOriginalTab      : false,
+	tpoKeyLeftmost        : { keyCode: 65, keyIdentifier: 'U+0041' },
+	tpoKeyLeft            : { keyCode: 83, keyIdentifier: 'U+0053' },
+	tpoKeyRight           : { keyCode: 68, keyIdentifier: 'U+0044' },
+	tpoKeyRightmost       : { keyCode: 70, keyIdentifier: 'U+0046' },
+	tpoKeyCurrent         : { keyCode: 71, keyIdentifier: 'U+0047' },
+	lastPrefPane          : 0,
+	specialSites          : [],
+	hardBlacklist         : [],
+	userBlacklist         : [
+		'//www.example.com/',
+		'^https?:\\/\\/www\\.example(\\.[a-z]+)+'
+	],
+};
+const linkBlacklist = [
+	/\/\/www\.google(\.[a-z]+)+\/reader\/view\//,
+	/\/\/api\.flattr\.com\//
+];
+const downloadPatterns = [
+	/\.dmg$/, /\.dmg\?/,
+	/\.zip$/, /\.zip\?/,
+	/\.pkg$/, /\.pkg\?/,
+	/\.safariextz$/, /\.safariextz\?/,
+	/\.torrent$/, /\.torrent\?/,
+	/\.iso$/, /\.iso\?/,
+	/\.rar$/, /\.rar\?/,
+	/\.exe$/, /\.exe\?/,
+	/\.tgz$/, /\.tgz\?/,
+	/\.gz$/ , /\.gz\?/ ,
+	/\.tar$/, /\.tar\?/,
+	/\.xar$/, /\.xar\?/,
+	/\.odm$/, /\.odm\?/,
+	/\.acsm$/, /\.acsm\?/
+];
+
+var sa = safari.application;
+var se = safari.extension;
+var openedTabs = []; // to keep Safari from GCing tab references
+var dummyLink = document.createElement('a');
+
+if (navigator.appVersion.match('Version/5.0')) {
+	sa.activeBrowserWindow.openTab().url = se.baseURI + 'upgrade_notice.html';
+} else {
+	initializeSettings();
+
+	sa.addEventListener("contextmenu", handleContextMenu, false);
+	sa.addEventListener("command", handleCommand, false);
+	sa.addEventListener("message", handleMessage, false);
+	se.settings.addEventListener("change", handleSettingChange, false);
+
+	se.addContentScriptFromURL(se.baseURI + 'injected.js', ['safari-reader://*/*'], null, true);
+}
+
 function SettingsObject(addedProps) {
 	for (var key in defaults) {
 		if (!(defaults[key] instanceof Array)) {
@@ -89,7 +156,7 @@ function handleContextMenu(event) {
 	}
 }
 function handleLinkKick(event) {
-	console.log('Handling link kick:', event.message);
+	console.log('link kick:', event.message);
 	var settings = event.message.settings;
 	var targetIsReader = event.target instanceof SafariReader;
 	var sourceTab = targetIsReader ? event.target.tab : event.target;
@@ -97,8 +164,10 @@ function handleLinkKick(event) {
 	var srcTabIndex = thisWindow.tabs.indexOf(sourceTab);
 	var background = !(event.message.shift ^ settings.focusLinkTarget);
 	var tpo = event.message.tpo;
-	var positionSetting = (tpo.ps != undefined) ? tpo.ps : (background) ? settings.newBgTabPosition : settings.newTabPosition;
+	var positionSetting = event.message.positionSetting;
 	var newTab;
+	if (positionSetting === null)
+		return;
 	if (tpo.fr)
 		background = !background;
 	if (targetIsReader)
@@ -234,6 +303,9 @@ function handleMessage(event) {
 		case 'closePrefsBox':
 			event.target.page.dispatchMessage('closePrefsBox');
 		break;
+		case 'consoleLog':
+			console.log.apply(window, event.message);
+		break;
 	}
 }
 function handleSettingChange(event) {
@@ -293,75 +365,12 @@ function initializeSettings() {
 		se.settings.userBlacklist = defaults.userBlackList;
 	}
 	if (lastVersion < 2042) {
-		(se.settings.newTabPosition   == undefined) && (se.settings.newTabPosition   = 1);
-		(se.settings.newBgTabPosition == undefined) && (se.settings.newBgTabPosition = 1);
+		if (se.settings.newTabPosition   == undefined) se.settings.newTabPosition   = 1;
+		if (se.settings.newBgTabPosition == undefined) se.settings.newBgTabPosition = 1;
 	}
-	se.settings.lastVersion = 2042;
-}
-
-const defaults = {
-	kickOnLinks           : 0,
-	kickOffLinks          : 0,
-	newTabPosition        : 1,
-	newBgTabPosition      : 1,
-	focusLinkTarget       : true,
-	preferWindows         : false,
-	cmdClickIgnoresTarget : true,
-	rightClickForCmdClick : false,
-	useTPOverrideKeys     : false,
-	tpOverrideKeyClicks   : false,
-	rewriteGoogleLinks    : false,
-	showLinkHrefs         : true,
-	showMenuItems         : true,
-	focusOriginalTab      : false,
-	tpoKeyLeftmost        : { keyCode: 65, keyIdentifier: 'U+0041' },
-	tpoKeyLeft            : { keyCode: 83, keyIdentifier: 'U+0053' },
-	tpoKeyRight           : { keyCode: 68, keyIdentifier: 'U+0044' },
-	tpoKeyRightmost       : { keyCode: 70, keyIdentifier: 'U+0046' },
-	tpoKeyCurrent         : { keyCode: 71, keyIdentifier: 'U+0047' },
-	lastPrefPane          : 0,
-	specialSites          : [],
-	hardBlacklist         : [],
-	userBlacklist         : [
-		'//www.example.com/',
-		'^https?:\\/\\/www\\.example(\\.[a-z]+)+'
-	],
-};
-const linkBlacklist = [
-	/\/\/www\.google(\.[a-z]+)+\/reader\/view\//,
-	/\/\/api\.flattr\.com\//
-];
-const downloadPatterns = [
-	/\.dmg$/, /\.dmg\?/,
-	/\.zip$/, /\.zip\?/,
-	/\.pkg$/, /\.pkg\?/,
-	/\.safariextz$/, /\.safariextz\?/,
-	/\.torrent$/, /\.torrent\?/,
-	/\.iso$/, /\.iso\?/,
-	/\.rar$/, /\.rar\?/,
-	/\.exe$/, /\.exe\?/,
-	/\.tgz$/, /\.tgz\?/,
-	/\.gz$/ , /\.gz\?/ ,
-	/\.tar$/, /\.tar\?/,
-	/\.xar$/, /\.xar\?/,
-	/\.odm$/, /\.odm\?/,
-	/\.acsm$/, /\.acsm\?/
-];
-
-var sa = safari.application;
-var se = safari.extension;
-var openedTabs = []; // to keep Safari from GCing tab references
-var dummyLink = document.createElement('a');
-
-if (navigator.appVersion.match('Version/5.0')) {
-	sa.activeBrowserWindow.openTab().url = se.baseURI + 'upgrade_notice.html';
-} else {
-	initializeSettings();
-
-	sa.addEventListener("contextmenu", handleContextMenu, false);
-	sa.addEventListener("command", handleCommand, false);
-	sa.addEventListener("message", handleMessage, false);
-	se.settings.addEventListener("change", handleSettingChange, false);
-
-	se.addContentScriptFromURL(se.baseURI + 'injected.js', ['safari-reader://*/*'], null, true);
+	if (lastVersion < 2051) {
+		if (se.settings.newTabPosition   == 1) se.settings.newTabPosition   = null;
+		if (se.settings.newBgTabPosition == 1) se.settings.newBgTabPosition = null;
+	}
+	se.settings.lastVersion = 2051;
 }

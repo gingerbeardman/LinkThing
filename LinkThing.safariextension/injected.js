@@ -9,11 +9,13 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 	}
 	if (positionOverride.ps !== undefined) {
 		if (settings.tpOverrideKeyClicks) {
-			var evt = document.createEvent('MouseEvents');
-			evt.initMouseEvent(
-				'click', true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY, 
-				false, false, false, false, 0, null
-			);
+			var ps = positionOverride.ps;
+			if (ps == 1)
+				positionOverride.ps = null;
+			var evt = new MouseEvent('click', {
+				button  : 0,
+				metaKey : ps !== null
+			});
 			this.dispatchEvent(evt);
 		}
 		if (hrefRevealer) {
@@ -82,23 +84,24 @@ HTMLAnchorElement.prototype.processLinkClick = function (e) {
 				}
 			}
 		}
-		var willKick = link.willKick(e, true);
-		// console.log('Link will kick:', willKick);
-		if (willKick) {
+		if (link.willKick(e, true)) {
 			var background = !(e.shiftKey ^ settings.focusLinkTarget);
-			var positionSetting = 
-				(positionOverride.ps !== undefined) ? positionOverride.ps :
-				(background) ? settings.newBgTabPosition : settings.newTabPosition;
-			e.stopPropagation();
-			e.preventDefault();			
-			var message = {
-				href     : link.href, 
-				tpo      : positionOverride || {}, 
-				shift    : e.shiftKey, 
-				option   : e.altKey, 
-				settings : settings 
-			};
-			safari.self.tab.dispatchMessage('handleLinkKick', message);
+			var positionSetting = (positionOverride.ps !== undefined) 
+				? positionOverride.ps 
+				: (background ? settings.newBgTabPosition : settings.newTabPosition);
+			if (positionSetting !== null) {
+				e.stopPropagation();
+				e.preventDefault();
+				var message = {
+					href            : link.href,
+					tpo             : positionOverride || {},
+					shift           : e.shiftKey,
+					option          : e.altKey,
+					positionSetting : positionSetting,
+					settings        : settings 
+				};
+				safari.self.tab.dispatchMessage('handleLinkKick', message);
+			}
 			positionOverride = {};
 			handleMouseOutOfLink(e);
 		} else {
@@ -227,7 +230,9 @@ function handleClick(e) {
 	while (node.href == undefined && node.parentNode) {
 		node = node.parentNode;
 	}
-	node.href && node.processLinkClick(e);
+	if (node.href) {
+		node.processLinkClick(e);
+	}
 }
 function handleContextMenu(e) {
 	var userInfo = {
@@ -249,15 +254,7 @@ function handleContextMenu(e) {
 	if (!siteIsBlacklisted) {
 		if (node.href && !e.ctrlKey && settings.rightClickForCmdClick) {
 			window.getSelection().empty();
-			e.preventDefault();/*
-			node.processLinkClick({
-				button          : 0,
-				metaKey         : true,
-				target          : node,
-				currentTarget   : node,
-				preventDefault  : function () {},
-				stopPropagation : function () {}
-			});*/
+			e.preventDefault();
 			var click = document.createEvent('MouseEvents');
 			click.initMouseEvent(
 				'click', true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY, 
