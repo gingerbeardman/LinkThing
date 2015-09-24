@@ -7,11 +7,13 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 		case settings.tpoKeyCurrent.keyCode   : positionOverride = { ps: null }; break;
 		default: return;
 	}
-	if (positionOverride.ps !== undefined) {
-		if (settings.tpOverrideKeyClicks) {
-			var ps = positionOverride.ps;
-			if (ps == 1)
-				positionOverride.ps = null;
+	if (positionOverride.ps === undefined) {
+		return;
+	}
+	if (settings.tpOverrideKeyClicks) {
+		var ps = positionOverride.ps;
+		if (ps == 1) {
+			positionOverride.ps = null;
 			var evt = new MouseEvent('click', {
 				button   : 0,
 				metaKey  : ps !== null,
@@ -19,19 +21,33 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 			});
 			this.dispatchEvent(evt);
 		}
-		if (hrefRevealer) {
-			var statusText = this.href;
-			var targetText = (
-				positionOverride.ps == -2   ? 'new leftmost'  :
-				positionOverride.ps ==  0   ? 'new left'      :
-				positionOverride.ps ==  1   ? 'new right'     :
-				positionOverride.ps == -1   ? 'new rightmost' :
-				positionOverride.ps == null ? 'this'          : ''
-			);
-			var focusText = (positionOverride.ps == null || (settings.focusLinkTarget ^ e.shiftKey)) ? '' : ' background';
-			statusText += ' (opens in ' + targetText + focusText + ' tab)';
-			hrefRevealer.say(statusText);
+		else if (ps === null) {
+			window.location.href = this.href;
 		}
+		else {
+			var message = {
+				href            : this.href,
+				tpo             : positionOverride || {},
+				shift           : e.shiftKey,
+				option          : e.altKey,
+				positionSetting : positionOverride.ps,
+				settings        : settings 
+			};
+			safari.self.tab.dispatchMessage('handleLinkKick', message);
+		}
+	}
+	if (hrefRevealer) {
+		var statusText = this.href;
+		var targetText = (
+			positionOverride.ps == -2   ? 'new leftmost'  :
+			positionOverride.ps ==  0   ? 'new left'      :
+			positionOverride.ps ==  1   ? 'new right'     :
+			positionOverride.ps == -1   ? 'new rightmost' :
+			positionOverride.ps == null ? 'this'          : ''
+		);
+		var focusText = (positionOverride.ps == null || (settings.focusLinkTarget ^ e.shiftKey)) ? '' : ' background';
+		statusText += ' (opens in ' + targetText + focusText + ' tab)';
+		hrefRevealer.say(statusText);
 	}
 }
 HTMLAnchorElement.prototype.isBlacklisted = function () {
