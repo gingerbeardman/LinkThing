@@ -17,7 +17,7 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 			var evt = new MouseEvent('click', {
 				button   : 0,
 				metaKey  : ps !== null,
-				shiftKey : positionOverride.fr
+				shiftKey : e.shiftKey
 			});
 			this.dispatchEvent(evt);
 		}
@@ -45,7 +45,8 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
 			positionOverride.ps == -1   ? 'new rightmost' :
 			positionOverride.ps == null ? 'this'          : ''
 		);
-		var focusText = (positionOverride.ps == null || (settings.focusLinkTarget ^ e.shiftKey)) ? '' : ' background';
+		var focusText = (positionOverride.ps == null || (!settings.focusLinkTarget !== !e.shiftKey)) 
+			? '' : ' background';
 		statusText += ' (opens in ' + targetText + focusText + ' tab)';
 		hrefRevealer.say(statusText);
 	}
@@ -102,7 +103,7 @@ HTMLAnchorElement.prototype.processLinkClick = function (e) {
 			}
 		}
 		if (link.willKick(e, true)) {
-			var background = !(e.shiftKey ^ settings.focusLinkTarget);
+			var background = !(!e.shiftKey !== !settings.focusLinkTarget);
 			var positionSetting = (positionOverride.ps !== undefined) 
 				? positionOverride.ps 
 				: (background ? settings.newBgTabPosition : settings.newTabPosition);
@@ -118,6 +119,12 @@ HTMLAnchorElement.prototype.processLinkClick = function (e) {
 					settings        : settings 
 				};
 				safari.self.tab.dispatchMessage('handleLinkKick', message);
+			} else {
+				if (background)
+					safari.self.tab.dispatchMessage('blurNextOpenedTab');
+				else {
+					safari.self.tab.dispatchMessage('focusNextOpenedTab');
+				}
 			}
 			positionOverride = {};
 			handleMouseOutOfLink(e);
@@ -159,8 +166,8 @@ HTMLAnchorElement.prototype.willKick = function (e, testedEligible) {
 	if (testedEligible || this.isEligible()) {
 		if (e.metaKey && e.shiftKey)
 			return true;
-		if (positionOverride.ps === null)
-			return false;
+		// if (positionOverride.ps === null)
+		// 	return false;
 		else if (positionOverride.ps !== undefined)
 			return true;
 		var samePage = (this.href.split('#')[0] == location.href.split('#')[0]) && !(/^\#\!/).test(this.hash);
@@ -179,7 +186,7 @@ HTMLAnchorElement.prototype.willKick = function (e, testedEligible) {
 			e.button == 2 ? true       :
 			e.metaKey
 		);
-		var conclusion = (settings.cmdClickIgnoresTarget) ? (wouldKick || reversal) : !!(wouldKick ^ reversal);
+		var conclusion = (settings.cmdClickIgnoresTarget) ? (wouldKick || reversal) : (!wouldKick !== !reversal);
 		return conclusion;
 	} else {
 		if (settings.downloadPatterns.some(matches, this.href))
@@ -435,7 +442,7 @@ function revealHref(evt, link) {
 			background = evt.shiftKey;
 			kickTest = evt.metaKey;
 		} else {
-			background = !(evt.shiftKey ^ settings.focusLinkTarget) || selfIsReader;
+			background = !(!evt.shiftKey !== !settings.focusLinkTarget) || selfIsReader;
 			kickTest = link.willKick(evt);
 		}
 		if (link.target && frameNames.indexOf(link.target) > -1) {

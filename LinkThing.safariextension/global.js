@@ -51,6 +51,7 @@ var sa = safari.application;
 var se = safari.extension;
 var openedTabs = []; // to keep Safari from GCing tab references
 var dummyLink = document.createElement('a');
+var previousActiveTab;
 
 if (navigator.appVersion.match('Version/5.0')) {
 	sa.activeBrowserWindow.openTab().url = se.baseURI + 'upgrade_notice.html';
@@ -100,6 +101,11 @@ function addLinkToIp(info) {
 	xhr.send(null);
 	sourceTab.page.dispatchMessage('ipAddState','saving');
 }
+function blurNextOpened(event) {
+	previousActiveTab.activate();
+	previousActiveTab = null;
+	sa.removeEventListener('open', blurNextOpened, true);
+}
 function getBlacklistStatus(url) {
 	function stringToRe(string) {
 		return new RegExp(string, 'i');
@@ -132,6 +138,10 @@ function getSitePrefs(hostname) {
 		preferWindows    : null
 	};
 }
+function focusNextOpened(event) {
+	event.target.activate();
+	sa.removeEventListener('open', focusNextOpened, true);
+}
 function handleCommand(event) {
 	var sourceTab = sa.activeBrowserWindow.activeTab;
 	if (event.command === 'showPrefsBox') {
@@ -162,7 +172,7 @@ function handleLinkKick(event) {
 	var sourceTab = targetIsReader ? event.target.tab : event.target;
 	var thisWindow = sourceTab.browserWindow;
 	var srcTabIndex = thisWindow.tabs.indexOf(sourceTab);
-	var background = !(event.message.shift ^ settings.focusLinkTarget);
+	var background = !(!event.message.shift !== !settings.focusLinkTarget);
 	var tpo = event.message.tpo;
 	var positionSetting = event.message.positionSetting;
 	var newTab;
@@ -210,6 +220,13 @@ function handleMessage(event) {
 		break;
 		case 'handleLinkKick':
 			handleLinkKick(event);
+		break;
+		case 'focusNextOpenedTab':
+			sa.addEventListener('open', focusNextOpened, true);
+		break;
+		case 'blurNextOpenedTab':
+			previousActiveTab = event.target;
+			sa.addEventListener('open', blurNextOpened, true);
 		break;
 		case 'loadInMyTab':
 			// message source must be a SafariReader instance
