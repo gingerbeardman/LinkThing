@@ -403,13 +403,11 @@ function handleMouseOver(e) {
 		}
 		if (rewriteGoogleLinks && link.getAttribute('onmousedown')) {
 			link.removeAttribute('onmousedown');
-			link.addEventListener('mousedown', function handleMouseDown(md) {
-				md.stopPropagation();
-				link.removeEventListener('mousedown', handleMouseDown, false);
-			}, true);
 			if (link.pathname == '/url') {
-				if ((/[?&]url=[^&]+/).test(link.search)) {
-					link.href = decodeURIComponent(link.search.split(/[?&]url=/)[1].split('&')[0]);
+				var url = (/[?&]url=([^&]+)/.exec(link.search) || [])[1];
+				if (url) {
+				    link.href = decodeURIComponent(url);
+				    console.log('Link changed to', url);
 				}
 			}
 		}
