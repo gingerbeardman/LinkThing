@@ -14,12 +14,24 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
     var ps = positionOverride.ps;
     if (ps == 1) {
       positionOverride.ps = null;
-      var evt = new MouseEvent('click', {
-        button   : 0,
-        metaKey  : ps !== null,
-        shiftKey : e.shiftKey
-      });
-      this.dispatchEvent(evt);
+      if (safariVersion >= 601) {
+        var message = {
+          href            : this.href,
+          tpo             : positionOverride || {},
+          shift           : e.shiftKey,
+          option          : e.altKey,
+          positionSetting : 1,
+          settings        : settings
+        };
+        safari.self.tab.dispatchMessage('handleLinkKick', message);
+      } else {
+        var evt = new MouseEvent('click', {
+          button   : 0,
+          metaKey  : true,
+          shiftKey : e.shiftKey
+        });
+        this.dispatchEvent(evt);
+      }
     }
     else if (ps === null) {
       window.location.href = this.href;
@@ -573,6 +585,7 @@ function showPrefsBox(coords) {
 }
 
 var settings          = {};
+var safariVersion     = /\bSafari\/(\d+)\b/.exec(navigator.appVersion)[1];
 var frameNames        = (window.name) ? [window.name] : [];
 var showLinkHrefs     = false;
 var hrefRevealer      = null;
