@@ -292,14 +292,12 @@ function handleContextMenu(e) {
   }
   if (!siteIsBlacklisted) {
     if (node.href && !e.ctrlKey && settings.rightClickForCmdClick) {
+      node.addEventListener('mouseup', function onMouseUp(mu) {
+        node.removeEventListener('mouseup', onMouseUp);
+        node.processLinkClick(mu);
+      });
       window.getSelection().empty();
       e.preventDefault();
-      var click = document.createEvent('MouseEvents');
-      click.initMouseEvent(
-        'click', true, true, window, 0, e.screenX, e.screenY, e.clientX, e.clientY,
-        false, false, e.shiftKey, true, 0, null
-      );
-      node.dispatchEvent(click);
     }
   }
 }
