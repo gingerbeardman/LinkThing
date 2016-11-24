@@ -583,7 +583,7 @@ function showPrefsBox(coords) {
 }
 
 var settings          = {};
-var safariVersion     = /\bSafari\/(\d+)\b/.exec(navigator.appVersion)[1];
+var safariVersion     = /\bAppleWebKit\/(\d+)\b/.exec(navigator.appVersion)[1];
 var frameNames        = (window.name) ? [window.name] : [];
 var showLinkHrefs     = false;
 var hrefRevealer      = null;
