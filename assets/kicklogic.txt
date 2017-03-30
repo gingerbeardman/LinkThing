@@ -1,0 +1,45 @@
+00 = 0 = kick-none
+01 = 1 = kick-offlinks
+10 = 2 = kick-ownlinks
+11 = 3 = kick-all
+
+
+                 offlinks                          offlinks
+                keep  kick                        keep  kick
+ownlinks  keep   00    01         ownlinks  keep    0     1
+ownlinks  kick   10    11         ownlinks  kick    2     3
+
+
+               global
+             ?    1    3
+
+local   ?   1,3  0,3  0,1
+        0   -----1,3-----
+        1   -----0,3-----
+        3   -----0,1-----
+ 
+
+AND               global            AND            global
+              00  01  10  11                     0  1  2  3
+                                    
+local   00    11  10  01  00        local   0    3  2  1  0
+        01    10  11  00  01                1    2  3  0  1
+        10    01  00  11  10                2    1  0  3  2
+        11    00  01  10  11                3    0  1  2  3
+                                    
+XOR               global            XOR            global
+              00  01  10  11                     0  1  2  3
+                                    
+local   00    00  01  10  11        local   0    0  1  2  3
+        01    01  00  11  10                1    1  0  3  2
+        10    10  11  00  01                2    2  3  0  1
+        11    11  10  01  00                3    3  2  1  0
+                                    
+ OR               global             OR            global
+              00  01  10  11                     0  1  2  3
+                                    
+local   00    00  01  10  11        local   0    0  1  2  3
+        01    01  01  11  11                1    1  1  3  3
+        10    10  11  10  11                2    2  3  2  3
+        11    11  11  11  11                3    3  3  3  3
+                                            
