@@ -12,26 +12,16 @@ HTMLAnchorElement.prototype.handleKeyUp = function (e) {
   }
   if (settings.tpOverrideKeyClicks) {
     var ps = positionOverride.ps;
-    if (ps == 1) {
+    if (ps === 1) {
       positionOverride.ps = null;
-      if (safariVersion >= 601) {
-        var message = {
-          href            : this.href,
-          tpo             : positionOverride || {},
-          shift           : e.shiftKey,
-          option          : e.altKey,
-          positionSetting : 1,
-          settings        : settings
-        };
-        safari.self.tab.dispatchMessage('handleLinkKick', message);
-      } else {
-        var evt = new MouseEvent('click', {
-          button   : 0,
-          metaKey  : true,
-          shiftKey : e.shiftKey
-        });
-        this.dispatchEvent(evt);
-      }
+      var oldTarget = this.target;
+      this.target = '_blank';
+      var evt = new MouseEvent('click', {
+        button   : 0,
+        shiftKey : e.shiftKey
+      });
+      this.dispatchEvent(evt);
+      this.target = oldTarget;
     }
     else if (ps === null) {
       window.location.href = this.href;

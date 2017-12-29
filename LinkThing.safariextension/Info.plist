@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Canisbos Computing</string>
 	<key>Builder Version</key>
-	<string>12603.1.30.0.20</string>
+	<string>12605.1.18.2</string>
 	<key>CFBundleDisplayName</key>
 	<string>LinkThing</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.3.17</string>
+	<string>2.3.18</string>
 	<key>CFBundleVersion</key>
-	<string>2060</string>
+	<string>2061</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
